@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Script Testris</title>
+		
+		<script src="jquery-1.11.1.min.js"></script>
+		<link rel="stylesheet" href="style.css" />
+		
+		<script type="text/javascript">
+		
+		/*
+		|----| 1 2 3 4
+		|----| 5 6 7 8
+		|----| 9 10 11 12
+		|----| 13 14 15 16
+		*/
+			var rows;
+			var columns;
+			var windowH;
+			var windowW;
+			var cubes = new Array();
+			
+			var timeout = 1000;
+						
+			function straightPiece(){
+				this.id = 1;
+				this.positionY = [0,1,2,3]; // rows
+				this.positionX = [0,0,0,0]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+									
+			function squarePiece(){
+				this.id = 2;
+				this.positionY = [0,1,0,1]; // rows
+				this.positionX = [0,0,1,1]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+					
+			function cornerLeftPiece(){
+				this.id = 3;
+				this.positionY = [0,1,1,1]; // rows
+				this.positionX = [0,0,1,2]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+						
+			function cornerRightPiece(){
+				this.id = 4;
+				this.positionY = [1,1,1,0]; // rows
+				this.positionX = [0,1,2,2]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+			
+			function wPiece(){
+				this.id = 5;
+				this.positionY = [1,1,0,1]; // rows
+				this.positionX = [0,1,1,2]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+						
+			function zLeftPiece(){
+				this.id = 6;
+				this.positionY = [0,0,1,1]; // rows
+				this.positionX = [0,1,1,2]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+					
+			function zRightPiece(){
+				this.id = 7;
+				this.positionY = [1,0,1,0]; // rows
+				this.positionX = [0,1,1,2]; // columns
+				this.color = 'blue';
+				this.isActive = false;
+			}
+			
+			
+			// Clock function
+			var clickTime = function(){
+				setTimeout(clickTime, timeout);
+			}
+			clickTime();
+			
+			// Randomly generates a new piece
+			function newPiece(){
+				var rand = Math.floor((Math.random()* 7) + 1);
+				
+				switch(rand){
+					case 1: return (new straightPiece());
+					case 2: return (new squarePiece());
+					case 3: return (new cornerLeftPiece());
+					case 4: return (new cornerRightPiece());
+					case 5: return (new wPiece());
+					case 6: return (new zLeftPiece()); 
+					case 7: return (new zRightPiece()); 
+				}
+			}
+			
+			// Place the piece in the grid
+			function placePiece(obj){
+				for(var i = 0; i < obj.positionY.length; i++){
+					cubes[obj.positionY[i]][obj.positionX[i]].style.backgroundColor = obj.color;
+				}
+			}
+			
+			function getTopCenterBlock(){
+				var sel = Math.floor(columns/2);				
+				return cubes[0][sel];
+			}
+			
+			/*----------Start Grid Making--------------*/
+			
+			// Find the number of cubes that fit vertically
+			function divideWinVertical(wH, cubeSize, padding){
+				var cubeV_noSpace = wH / cubeSize;
+				rows = (wH - cubeV_noSpace) / cubeSize;
+				rows = Math.floor(rows);
+
+				return rows;
+			}
+			
+			// Find the number of cubes that fit horizontally
+			function divideWinHorizontal(wW, cubeSize){
+				var cubeH_noSpace = wW / cubeSize;
+				columns = (wW - (cubeH_noSpace)) / cubeSize;
+				columns = Math.floor(columns);
+				console.log("horizontal blocks: " + columns);
+				return columns;
+			}
+			
+			function CreateGrid(size, numberOfCubesH, numberOfCubesV){
+				var i;
+				var j;
+				for(j = 0; j < numberOfCubesV; j++){
+					cubes[j] = new Array();
+					for(i = 0; i <  numberOfCubesH ; i++){
+						cubes[j][i] = document.createElement('div');
+						cubes[j][i].className = "cube";
+						cubes[j][i].style.height = size + 'px';
+						cubes[j][i].style.width = size + 'px';
+						cubes[j][i].style.display = "inline-block";
+						cubes[j][i].setAttribute("data-row", j);
+						cubes[j][i].setAttribute("data-column", i);
+					
+						document.getElementById("wrapper").appendChild(cubes[j][i]);
+						
+					}
+					
+					//Check if number of rows is over and prevent from adding more rows.
+					var rect = cubes[j][i-1].getBoundingClientRect();
+					if(rect.bottom > windowH -20) return;
+					
+					var br = document.createElement('br');
+					document.getElementById("wrapper").appendChild(br);
+				}
+								
+				console.log("Horizontal: "+numberOfCubesH);
+				console.log("Vertical: "+numberOfCubesV);
+			}
+		
+		
+		$(document).ready(function(){
+		
+			//var windowH = $(document).height();
+			//var windowW = $(document).width();
+
+			
+			windowH = document.getElementById('wrapper').clientHeight;
+			windowW = document.getElementById('wrapper').clientWidth;
+
+			var cubeSize = 18;
+			console.log("document.height: "+windowH);
+			console.log("document.width: " +windowW);
+			
+			var vCubes = divideWinVertical(windowH, cubeSize);
+			var hCubes = divideWinHorizontal(windowW, cubeSize);
+			CreateGrid(cubeSize, hCubes, vCubes);
+			
+			console.log("Vertical blocks: " + rows);
+			
+			console.log(newPiece());
+			placePiece(newPiece());
+		});
+		
+		
+		
+		
+		</script>
+		
+	</head>
+	<body>
+	
+	<div id="wrapper"></div>
+	
+	</body>
+</html>
