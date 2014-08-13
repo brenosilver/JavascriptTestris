@@ -19,6 +19,7 @@
 			var windowH;
 			var windowW;
 			var cubes = new Array();
+			var cubeTimeOffset = 0;
 			
 			var timeout = 1000;
 						
@@ -78,12 +79,31 @@
 				this.isActive = false;
 			}
 			
+			function cube(size, row, column){
+				this.row = row;
+				this.column = column;
+				this.element = document.createElement('div');
+				this.element.className = "cube";
+				this.element.style.height = size + 'px';
+				this.element.style.width = size + 'px';
+				this.element.style.display = "inline-block";
+				this.element.setAttribute("data-row", this.row);
+				this.element.setAttribute("data-column", this.column);
+			}
+			
 			
 			// Clock function
-			var clickTime = function(){
+			function clickTime(piece){
+				if(piece != null) this.piece = piece;
+				
+				cubeTimeOffset++;
+				if(cubeTimeOffset > rows) cubeTimeOffset = 0;
+				
+				console.log("piece : "+this.piece);
+				movePiece(this.piece, cubeTimeOffset);
+				
 				setTimeout(clickTime, timeout);
 			}
-			clickTime();
 			
 			// Randomly generates a new piece
 			function newPiece(){
@@ -103,8 +123,20 @@
 			// Place the piece in the grid
 			function placePiece(obj){
 				for(var i = 0; i < obj.positionY.length; i++){
-					cubes[obj.positionY[i]][obj.positionX[i]].style.backgroundColor = obj.color;
+					cubes[obj.positionY[i]][obj.positionX[i]].element.style.backgroundColor = obj.color;
 				}
+			}
+			
+			// Move pieces down the cubes each time click
+			function movePiece(obj, timeOffset){
+			
+				for(var i = 0; i < obj.positionY.length; i++){
+					cubes[obj.positionY[i]+timeOffset][obj.positionX[i]].element.style.backgroundColor = obj.color;
+				}
+				
+				/*for(var i = 0; i < obj.positionY.length; i++){
+					if(obj.positionY[i]+timeOffset >= 0) cubes[obj.positionY[i]+timeOffset][obj.positionX[i]].element.style.backgroundColor = 'grey';
+				}*/
 			}
 			
 			function getTopCenterBlock(){
@@ -138,20 +170,12 @@
 				for(j = 0; j < numberOfCubesV; j++){
 					cubes[j] = new Array();
 					for(i = 0; i <  numberOfCubesH ; i++){
-						cubes[j][i] = document.createElement('div');
-						cubes[j][i].className = "cube";
-						cubes[j][i].style.height = size + 'px';
-						cubes[j][i].style.width = size + 'px';
-						cubes[j][i].style.display = "inline-block";
-						cubes[j][i].setAttribute("data-row", j);
-						cubes[j][i].setAttribute("data-column", i);
-					
-						document.getElementById("wrapper").appendChild(cubes[j][i]);
-						
+						cubes[j][i] = new cube(size, j, i);
+						document.getElementById("wrapper").appendChild(cubes[j][i].element);
 					}
 					
 					//Check if number of rows is over and prevent from adding more rows.
-					var rect = cubes[j][i-1].getBoundingClientRect();
+					var rect = cubes[j][i-1].element.getBoundingClientRect();
 					if(rect.bottom > windowH -20) return;
 					
 					var br = document.createElement('br');
@@ -182,8 +206,8 @@
 			
 			console.log("Vertical blocks: " + rows);
 			
-			console.log(newPiece());
-			placePiece(newPiece());
+			//placePiece(newPiece());
+			clickTime(newPiece());
 		});
 		
 		
