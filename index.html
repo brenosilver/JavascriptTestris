@@ -20,6 +20,7 @@
 			var windowW;
 			var cubes = new Array();
 			var cubeTimeOffset = 0;
+			var interval;
 			
 			var timeout = 1000;
 						
@@ -82,6 +83,7 @@
 			function cube(size, row, column){
 				this.row = row;
 				this.column = column;
+				this.newCube = false;
 				this.element = document.createElement('div');
 				this.element.className = "cube";
 				this.element.style.height = size + 'px';
@@ -96,13 +98,13 @@
 			function clickTime(piece){
 				if(piece != null) this.piece = piece;
 				
-				cubeTimeOffset++;
 				if(cubeTimeOffset > rows) cubeTimeOffset = 0;
 				
 				console.log("piece : "+this.piece);
 				movePiece(this.piece, cubeTimeOffset);
 				
-				setTimeout(clickTime, timeout);
+				interval = setTimeout(clickTime, timeout);
+				cubeTimeOffset++;
 			}
 			
 			// Randomly generates a new piece
@@ -129,14 +131,30 @@
 			
 			// Move pieces down the cubes each time click
 			function movePiece(obj, timeOffset){
-			
-				for(var i = 0; i < obj.positionY.length; i++){
-					cubes[obj.positionY[i]+timeOffset][obj.positionX[i]].element.style.backgroundColor = obj.color;
+				
+				// Erase pieces
+				for(var i = 0; i < rows; i++){
+					for(var j = 0; j < columns; j++){
+						var current = cubes[i][j];
+						if(current.newCube == true){
+							current.element.style.backgroundColor = 'grey';
+							current.newCube = false;
+						}
+					}
 				}
 				
-				/*for(var i = 0; i < obj.positionY.length; i++){
-					if(obj.positionY[i]+timeOffset >= 0) cubes[obj.positionY[i]+timeOffset][obj.positionX[i]].element.style.backgroundColor = 'grey';
-				}*/
+				// Add pieces
+				for(var i = 0; i < obj.positionY.length; i++){
+					if(timeOffset < rows-1){
+						var current = cubes[obj.positionY[i]+timeOffset][obj.positionX[i]];
+						if(current.newCube == false){ // if cube is not a new cube, make it one.
+							current.element.style.backgroundColor = obj.color;
+							current.newCube = true;
+							//console.log(timeOffset);
+						}
+					}
+					else clearInterval(interval);
+				}
 			}
 			
 			function getTopCenterBlock(){
@@ -150,7 +168,7 @@
 			function divideWinVertical(wH, cubeSize, padding){
 				var cubeV_noSpace = wH / cubeSize;
 				rows = (wH - cubeV_noSpace) / cubeSize;
-				rows = Math.floor(rows);
+				rows = Math.floor(rows) -2;
 
 				return rows;
 			}
@@ -207,6 +225,7 @@
 			console.log("Vertical blocks: " + rows);
 			
 			//placePiece(newPiece());
+			console.log(cubes);
 			clickTime(newPiece());
 		});
 		
