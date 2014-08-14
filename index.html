@@ -28,6 +28,11 @@
 				this.id = 1;
 				this.positionY = [0,1,2,3]; // rows
 				this.positionX = [0,0,0,0]; // columns
+				this.position0 = cubes[0][0];
+				this.position1 = cubes[1][0];
+				this.position2 = cubes[2][0];
+				this.position3 = cubes[3][0];
+				this.allCubes = [cubes[0][0], cubes[1][0], cubes[2][0], cubes[3][0]];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -36,6 +41,11 @@
 				this.id = 2;
 				this.positionY = [0,1,0,1]; // rows
 				this.positionX = [0,0,1,1]; // columns
+				this.position0 = cubes[0][0];
+				this.position1 = cubes[1][0];
+				this.position2 = cubes[0][1];
+				this.position3 = cubes[1][1];
+				this.allCubes = [cubes[0][0], cubes[1][0], cubes[0][1], cubes[1][1]];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -44,6 +54,11 @@
 				this.id = 3;
 				this.positionY = [0,1,1,1]; // rows
 				this.positionX = [0,0,1,2]; // columns
+				this.position0 = cubes[0][0];
+				this.position1 = cubes[1][0];
+				this.position2 = cubes[1][1];
+				this.position3 = cubes[1][2];
+				this.allCubes = [cubes[0][0], cubes[1][0], cubes[1][1], cubes[1][2]];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -52,6 +67,11 @@
 				this.id = 4;
 				this.positionY = [1,1,1,0]; // rows
 				this.positionX = [0,1,2,2]; // columns
+				this.position0 = cubes[1][0];
+				this.position1 = cubes[1][1];
+				this.position2 = cubes[1][2];
+				this.position3 = cubes[0][2];
+				this.allCubes = [cubes[1][0], cubes[1][1], cubes[1][2], cubes[0][2]];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -60,6 +80,11 @@
 				this.id = 5;
 				this.positionY = [1,1,0,1]; // rows
 				this.positionX = [0,1,1,2]; // columns
+				this.position0 = cubes[1][0];
+				this.position1 = cubes[1][1];
+				this.position2 = cubes[0][1];
+				this.position3 = cubes[1][2];
+				this.allCubes = [cubes[1][0], cubes[1][1], cubes[0][1], cubes[1][2]];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -68,6 +93,11 @@
 				this.id = 6;
 				this.positionY = [0,0,1,1]; // rows
 				this.positionX = [0,1,1,2]; // columns
+				this.position0 = cubes[0][0];
+				this.position1 = cubes[0][1];
+				this.position2 = cubes[1][1];
+				this.position3 = cubes[1][2];
+				this.allCubes = [cubes[0][0], cubes[0][1], cubes[1][1], cubes[1][2]];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -76,6 +106,10 @@
 				this.id = 7;
 				this.positionY = [1,0,1,0]; // rows
 				this.positionX = [0,1,1,2]; // columns
+				this.position0 = cubes[1][0];
+				this.position1 = cubes[0][1];
+				this.position2 = cubes[1][1];
+				this.position3 = cubes[0][2];
 				this.color = 'blue';
 				this.isActive = false;
 			}
@@ -92,6 +126,15 @@
 				this.element.setAttribute("data-row", this.row);
 				this.element.setAttribute("data-column", this.column);
 			}
+			
+			function pieceObj(cube1, cube2, cube3, cube4){
+				this.cube1 = cube1;
+				this.cube2 = cube2;
+				this.cube3 = cube3;
+				this.cube4 = cube4;
+			}
+			
+			/*----------End of objects----------*/
 			
 			
 			// Clock function
@@ -150,11 +193,19 @@
 						if(current.newCube == false){ // if cube is not a new cube, make it one.
 							current.element.style.backgroundColor = obj.color;
 							current.newCube = true;
-							//console.log(timeOffset);
 						}
 					}
 					else clearInterval(interval);
 				}
+			}
+			
+			// Updates Y position of new pieces so they can move down the grid
+			function changePieceTimeOffset(obj, timeOffset){
+				obj.position0 = cubes[obj.positionY[0]+timeOffset][obj.positionX[0]];
+				obj.position1 = cubes[obj.positionY[1]+timeOffset][obj.positionX[1]];
+				obj.position2 = cubes[obj.positionY[2]+timeOffset][obj.positionX[2]];
+				obj.position3 = cubes[obj.positionY[3]+timeOffset][obj.positionX[3]];
+
 			}
 			
 			function getTopCenterBlock(){
@@ -168,7 +219,7 @@
 			function divideWinVertical(wH, cubeSize, padding){
 				var cubeV_noSpace = wH / cubeSize;
 				rows = (wH - cubeV_noSpace) / cubeSize;
-				rows = Math.floor(rows) -2;
+				rows = Math.floor(rows) ;
 
 				return rows;
 			}
